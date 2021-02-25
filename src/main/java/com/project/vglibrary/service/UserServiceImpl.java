@@ -1,6 +1,7 @@
 package com.project.vglibrary.service;
 
 import com.project.vglibrary.entity.User;
+import com.project.vglibrary.exception.ResourceNotFoundException;
 import com.project.vglibrary.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,6 +23,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByUsername(String username) {
-        return userRepository.findByUsername(username);
+        return userRepository.findByUsername(username).orElseThrow(
+                () -> new ResourceNotFoundException("User", "username", username));
     }
 }

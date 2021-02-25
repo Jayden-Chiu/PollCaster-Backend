@@ -1,6 +1,8 @@
 package com.project.vglibrary.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -15,11 +17,9 @@ public class User {
     private Long id;
 
     @Column(name = "username")
-    @Size(max = 15)
     private String username;
 
     @Column(name = "password")
-    @Size(max = 32)
     private String password;
 
     public User() {

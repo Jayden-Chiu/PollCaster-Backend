@@ -2,6 +2,7 @@ package com.project.vglibrary.service;
 
 import com.project.vglibrary.entity.User;
 import com.project.vglibrary.entity.UserDetailsImpl;
+import com.project.vglibrary.exception.ResourceNotFoundException;
 import com.project.vglibrary.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,7 +21,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new UsernameNotFoundException("User not found with username: " + username));
+                () -> new ResourceNotFoundException("User", "username", username));
 
         return new UserDetailsImpl(user);
     }
@@ -28,7 +29,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Transactional
     public UserDetails loadUserById(Long id) {
         User user = userRepository.findById(id).orElseThrow(
-                () -> new UsernameNotFoundException("User not found with id: " + id));
+                () -> new ResourceNotFoundException("User", "id", id));
         return new UserDetailsImpl(user);
     }
 }
