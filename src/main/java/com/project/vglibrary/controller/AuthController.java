@@ -1,6 +1,7 @@
 package com.project.vglibrary.controller;
 
 import com.project.vglibrary.entity.User;
+import com.project.vglibrary.exception.ResourceNotFoundException;
 import com.project.vglibrary.payload.request.LoginRequest;
 import com.project.vglibrary.payload.request.SignupRequest;
 import com.project.vglibrary.payload.response.ApiResponse;
@@ -16,10 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
@@ -41,6 +39,7 @@ public class AuthController {
     @Autowired
     JwtTokenProvider jwtTokenProvider;
 
+    // authenticate user
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
@@ -56,6 +55,7 @@ public class AuthController {
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
 
+    // create user
     @PostMapping("/signup")
     public ResponseEntity<?> signupUser(@Valid @RequestBody SignupRequest signupRequest) {
         String username = signupRequest.getUsername();
@@ -76,5 +76,15 @@ public class AuthController {
         return ResponseEntity.created(location).body(
                 new ApiResponse(true, "User created successfully!")
         );
+    }
+
+    // Update user
+    @PutMapping("/{id}")
+    public User updateUser(@Valid @RequestBody User user, @PathVariable(value = "id") Long id) {
+        User existingUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User",
+                "id", id));
+        existingUser.setUsername(user.getUsername());
+        existingUser.setPassword(user.getPassword());
+        return userService.save(existingUser);
     }
 }

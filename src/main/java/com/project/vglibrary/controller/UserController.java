@@ -18,10 +18,6 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private UserServiceImpl userService;
-
-
     // Get all users
     @GetMapping("/")
     public List<User> getAllUsers() {
@@ -32,15 +28,6 @@ public class UserController {
     @GetMapping("/{id}")
     public User getUserById(@PathVariable(value = "id") Long id) {
         return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
-    }
-
-    // Update user
-    @PutMapping("/{id}")
-    public User updateUser(@RequestBody User user, @PathVariable(value = "id") Long id) {
-        User existingUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User",
-                "id", id));
-        existingUser.setUsername(user.getUsername());
-        return userRepository.save(existingUser);
     }
 
     // Delete user by id
