@@ -1,10 +1,12 @@
 package com.project.vglibrary.config;
 
+import com.project.vglibrary.security.jwt.JwtAuthenticationEntryPoint;
 import com.project.vglibrary.security.jwt.JwtAuthenticationFilter;
 import com.project.vglibrary.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -21,6 +23,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
+    @Autowired
+    private JwtAuthenticationEntryPoint unauthorizedHandler;
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
       auth.userDetailsService(userDetailsService);
@@ -33,7 +38,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable().authorizeRequests();
+        http
+                .cors()
+                    .and()
+                .csrf()
+                    .disable().
+                exceptionHandling()
+                    .authenticationEntryPoint(unauthorizedHandler)
+                    .and()
+                .authorizeRequests()
+                    .antMatchers("/api/auth/**")
+                        .permitAll()
+                    .antMatchers(HttpMethod.GET, "/api/users/**")
+                        .permitAll()
+                    .anyRequest()
+                        .authenticated();
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
