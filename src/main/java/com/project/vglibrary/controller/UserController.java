@@ -1,20 +1,27 @@
 package com.project.vglibrary.controller;
 
+import com.project.vglibrary.entity.UserDetailsImpl;
 import com.project.vglibrary.entity.User;
 import com.project.vglibrary.exception.ResourceNotFoundException;
 import com.project.vglibrary.repository.UserRepository;
+import com.project.vglibrary.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
 
-    @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
+
+    private UserServiceImpl userService;
+
 
     // Get all users
     @GetMapping("/")
@@ -24,19 +31,19 @@ public class UserController {
 
     // Get user by id
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable(value = "id") long userId) {
+    public User getUserById(@PathVariable(value = "id") Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
     }
 
     // Create user
     @PostMapping("/")
-    public User createUser(@RequestBody User user) {
-        return userRepository.save(user);
+    public User createUser(@Valid @RequestBody User user) {
+        return userService.save(user);
     }
 
     // Update user
     @PutMapping("/{id}")
-    public User updateUser(@RequestBody User user, @PathVariable(value = "id") long userId) {
+    public User updateUser(@RequestBody User user, @PathVariable(value = "id") Long userId) {
         User existingUser = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User",
                 "id", userId));
         existingUser.setUsername(user.getUsername());
@@ -45,7 +52,7 @@ public class UserController {
 
     // Delete user by id
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteNote(@PathVariable(value = "id") long userId) {
+    public ResponseEntity<?> deleteNote(@PathVariable(value = "id") Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id",
                 userId));
 
