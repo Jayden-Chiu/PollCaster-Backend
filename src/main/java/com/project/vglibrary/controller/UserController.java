@@ -1,14 +1,10 @@
 package com.project.vglibrary.controller;
 
-import com.project.vglibrary.entity.UserDetailsImpl;
 import com.project.vglibrary.entity.User;
 import com.project.vglibrary.exception.ResourceNotFoundException;
 import com.project.vglibrary.repository.UserRepository;
 import com.project.vglibrary.service.UserServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
