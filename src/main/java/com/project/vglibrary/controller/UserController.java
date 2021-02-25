@@ -34,12 +34,6 @@ public class UserController {
         return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
     }
 
-    // Create user
-    @PostMapping("/")
-    public User createUser(@Valid @RequestBody User user) {
-        return userService.save(user);
-    }
-
     // Update user
     @PutMapping("/{id}")
     public User updateUser(@RequestBody User user, @PathVariable(value = "id") Long id) {
