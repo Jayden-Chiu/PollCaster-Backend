@@ -1,5 +1,7 @@
 package com.project.pollcaster.entity;
 
+import com.project.pollcaster.audit.Auditable;
+
 import javax.persistence.*;
 
 @Entity
@@ -7,7 +9,7 @@ import javax.persistence.*;
         @UniqueConstraint(columnNames = {
                 "username"
         })})
-public class User {
+public class User extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
