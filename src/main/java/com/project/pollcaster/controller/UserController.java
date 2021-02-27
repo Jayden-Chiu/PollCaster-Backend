@@ -20,7 +20,9 @@ public class UserController {
     @GetMapping("/current")
     @PreAuthorize("isAuthenticated()")
     public UserProfile getCurrentUser(@CurrentUser UserDetailsImpl currentUser) {
-        return new UserProfile(currentUser);
+        Long id = currentUser.getId();
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        return new UserProfile(user);
     }
 
     @GetMapping("/{id}")
