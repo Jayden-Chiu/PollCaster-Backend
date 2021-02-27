@@ -3,7 +3,7 @@ package com.project.vglibrary.payload.request;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-public class SignupRequest {
+public class SignupUpdateRequest {
     @NotBlank
     @Size(min = 4, max = 20)
     private String username;

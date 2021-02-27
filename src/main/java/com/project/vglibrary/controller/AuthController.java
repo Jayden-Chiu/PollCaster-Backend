@@ -1,22 +1,24 @@
 package com.project.vglibrary.controller;
 
 import com.project.vglibrary.entity.User;
+import com.project.vglibrary.entity.UserDetailsImpl;
 import com.project.vglibrary.exception.ResourceNotFoundException;
 import com.project.vglibrary.payload.request.LoginRequest;
-import com.project.vglibrary.payload.request.SignupRequest;
+import com.project.vglibrary.payload.request.SignupUpdateRequest;
 import com.project.vglibrary.payload.response.ApiResponse;
 import com.project.vglibrary.payload.response.JwtAuthenticationResponse;
 import com.project.vglibrary.repository.UserRepository;
+import com.project.vglibrary.security.CurrentUser;
 import com.project.vglibrary.security.jwt.JwtTokenProvider;
 import com.project.vglibrary.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -57,9 +59,9 @@ public class AuthController {
 
     // create user
     @PostMapping("/signup")
-    public ResponseEntity<?> signupUser(@Valid @RequestBody SignupRequest signupRequest) {
-        String username = signupRequest.getUsername();
-        String password = signupRequest.getPassword();
+    public ResponseEntity<?> signupUser(@Valid @RequestBody SignupUpdateRequest signupUpdateRequest) {
+        String username = signupUpdateRequest.getUsername();
+        String password = signupUpdateRequest.getPassword();
 
         if (userRepository.existsByUsername(username)) {
             return new ResponseEntity(
@@ -79,12 +81,33 @@ public class AuthController {
     }
 
     // Update user
-    @PutMapping("/{id}")
-    public User updateUser(@Valid @RequestBody User user, @PathVariable(value = "id") Long id) {
+    @PutMapping("/update")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> updateUser(@CurrentUser UserDetailsImpl currentUser,
+                           @RequestBody @Valid SignupUpdateRequest signupUpdateRequest) {
+        Long id = currentUser.getId();
+        String newUsername = signupUpdateRequest.getUsername();
+        String newPassword = signupUpdateRequest.getPassword();
+
+        if (userRepository.existsByUsername(newUsername)) {
+            return new ResponseEntity(
+                    new ApiResponse(false, "Username is already taken!"),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
         User existingUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User",
                 "id", id));
-        existingUser.setUsername(user.getUsername());
-        existingUser.setPassword(user.getPassword());
-        return userService.save(existingUser);
+        existingUser.setUsername(newUsername);
+        existingUser.setPassword(newPassword);
+
+        User newUser = userService.save(existingUser);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/users/{id}")
+                .buildAndExpand(id).toUri();
+
+        return ResponseEntity.created(location).body(
+                new ApiResponse(true, "User updated successfully!")
+        );
     }
 }
