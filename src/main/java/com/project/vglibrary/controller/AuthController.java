@@ -81,7 +81,7 @@ public class AuthController {
     }
 
     // Update user
-    @PutMapping("/update")
+    @PatchMapping("/update")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> updateUser(@CurrentUser UserDetailsImpl currentUser,
                            @RequestBody @Valid SignupUpdateRequest signupUpdateRequest) {
