@@ -86,10 +86,11 @@ public class AuthController {
     public ResponseEntity<?> updateUser(@CurrentUser UserDetailsImpl currentUser,
                            @RequestBody @Valid SignupUpdateRequest signupUpdateRequest) {
         Long id = currentUser.getId();
+        String oldUsername = currentUser.getUsername();
         String newUsername = signupUpdateRequest.getUsername();
         String newPassword = signupUpdateRequest.getPassword();
 
-        if (userRepository.existsByUsername(newUsername)) {
+        if (!oldUsername.equals(newUsername) && userRepository.existsByUsername(newUsername)) {
             return new ResponseEntity(
                     new ApiResponse(false, "Username is already taken!"),
                     HttpStatus.BAD_REQUEST
