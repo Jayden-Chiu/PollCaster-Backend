@@ -1,6 +1,7 @@
 package com.project.pollcaster.audit;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.project.pollcaster.entity.User;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -13,7 +14,7 @@ import java.time.Instant;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(
-        value = {"createdAt", "updatedAt"},
+        value = {"createdAt", "updatedAt", "createdBy"},
         allowGetters = true
 )
 public abstract class Auditable {
@@ -25,6 +26,10 @@ public abstract class Auditable {
     @LastModifiedDate
     @Column(nullable = false)
     private Instant updatedAt;
+
+    @CreatedBy
+    @Column(updatable = false)
+    private Long createdBy;
 
     public Instant getCreatedAt() {
         return createdAt;
