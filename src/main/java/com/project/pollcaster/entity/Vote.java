@@ -4,6 +4,8 @@ import com.project.pollcaster.audit.Auditable;
 
 import javax.persistence.*;
 
+@Entity
+@Table(name = "votes")
 public class Vote extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
