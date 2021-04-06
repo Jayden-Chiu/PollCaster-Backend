@@ -16,11 +16,18 @@ public class Choice {
     @Size(max = 50)
     private String text;
 
+    private int voteCount;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "poll_id", nullable = false)
     private Poll poll;
 
     public Choice() {
+    }
+
+    public Choice(String text) {
+        this.text = text;
+        this.voteCount = 0;
     }
 
     public Long getId() {
@@ -45,5 +52,13 @@ public class Choice {
 
     public void setPoll(Poll poll) {
         this.poll = poll;
+    }
+
+    public int getVoteCount() {
+        return voteCount;
+    }
+
+    public void setVoteCount(int voteCount) {
+        this.voteCount = voteCount;
     }
 }

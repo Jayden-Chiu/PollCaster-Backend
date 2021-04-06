@@ -30,6 +30,11 @@ public class Poll extends Auditable {
     public Poll() {
     }
 
+    public void addChoice(Choice choice) {
+        choices.add(choice);
+        choice.setPoll(this);
+    }
+
     public Long getId() {
         return id;
     }
