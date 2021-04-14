@@ -3,6 +3,8 @@ package com.project.pollcaster.entity;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 
@@ -16,18 +18,23 @@ public class Choice {
     @Size(max = 50)
     private String text;
 
-    private int voteCount;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "poll_id", nullable = false)
     private Poll poll;
+
+    @OneToMany(
+            mappedBy = "choice",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true
+    )
+    private List<Vote> votes = new ArrayList<>();
 
     public Choice() {
     }
 
     public Choice(String text) {
         this.text = text;
-        this.voteCount = 0;
     }
 
     public Long getId() {
@@ -54,11 +61,11 @@ public class Choice {
         this.poll = poll;
     }
 
-    public int getVoteCount() {
-        return voteCount;
+    public List<Vote> getVotes() {
+        return votes;
     }
 
-    public void setVoteCount(int voteCount) {
-        this.voteCount = voteCount;
+    public void setVotes(List<Vote> votes) {
+        this.votes = votes;
     }
 }

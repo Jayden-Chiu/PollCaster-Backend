@@ -3,6 +3,8 @@ package com.project.pollcaster.entity;
 import com.project.pollcaster.audit.Auditable;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")

@@ -5,7 +5,12 @@ import com.project.pollcaster.audit.Auditable;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "votes")
+@Table(name = "votes", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {
+                "poll_id",
+                "user_id"
+        })
+})
 public class Vote extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

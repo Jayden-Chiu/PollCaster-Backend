@@ -3,6 +3,7 @@ package com.project.pollcaster.controller;
 import com.project.pollcaster.entity.Poll;
 import com.project.pollcaster.entity.UserDetailsImpl;
 import com.project.pollcaster.payload.request.PollRequest;
+import com.project.pollcaster.payload.request.VoteRequest;
 import com.project.pollcaster.payload.response.ApiResponse;
 import com.project.pollcaster.payload.response.PageResponse;
 import com.project.pollcaster.payload.response.PollResponse;
@@ -39,6 +40,14 @@ public class PollController {
         return pollService.getAllPolls(currentUser, pageable);
     }
 
+    // get poll by id
+    @GetMapping("/{pollId}")
+    public PollResponse getPollById(@CurrentUser UserDetailsImpl currentUser,
+                                    @PathVariable Long pollId) {
+        return pollService.getPollById(pollId, currentUser);
+    }
+
+    // create poll
     @PostMapping
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> createPoll(@Valid @RequestBody PollRequest pollRequest) {
@@ -50,5 +59,13 @@ public class PollController {
 
         return ResponseEntity.created(location)
                 .body(new ApiResponse(true, "Poll Created Successfully"));
+    }
+
+    @PostMapping("/{pollId}/vote")
+    @PreAuthorize("isAuthenticated()")
+    public PollResponse castVote(@CurrentUser UserDetailsImpl currentUser,
+                                 @PathVariable Long pollId,
+                                 @Valid @RequestBody VoteRequest voteRequest) {
+        return pollService.castVote(pollId, voteRequest, currentUser);
     }
 }
