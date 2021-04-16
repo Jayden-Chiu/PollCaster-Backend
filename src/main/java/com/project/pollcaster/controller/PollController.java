@@ -68,4 +68,13 @@ public class PollController {
                                  @Valid @RequestBody VoteRequest voteRequest) {
         return pollService.castVote(pollId, voteRequest, currentUser);
     }
+
+    @DeleteMapping("/{pollId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> deletePoll(@CurrentUser UserDetailsImpl currentUser,
+                                  @PathVariable Long pollId) {
+
+        return pollService.deletePoll(pollId, currentUser);
+    }
+
 }

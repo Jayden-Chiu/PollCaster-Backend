@@ -5,17 +5,15 @@ import com.project.pollcaster.exception.BadRequestException;
 import com.project.pollcaster.exception.ResourceNotFoundException;
 import com.project.pollcaster.payload.request.PollRequest;
 import com.project.pollcaster.payload.request.VoteRequest;
-import com.project.pollcaster.payload.response.ChoiceResponse;
-import com.project.pollcaster.payload.response.PageResponse;
-import com.project.pollcaster.payload.response.PollResponse;
-import com.project.pollcaster.payload.response.UserProfile;
+import com.project.pollcaster.payload.response.*;
 import com.project.pollcaster.repository.PollRepository;
 import com.project.pollcaster.repository.UserRepository;
 import com.project.pollcaster.repository.VoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -75,7 +73,8 @@ public class PollService {
 
     }
 
-    public PollResponse mapPollToPollResponse(Poll poll, UserDetailsImpl currentUser, List<ChoiceResponse> choiceResponses) {
+    public PollResponse mapPollToPollResponse(Poll poll, UserDetailsImpl currentUser,
+                                              List<ChoiceResponse> choiceResponses) {
         PollResponse pollResponse = new PollResponse();
         pollResponse.setId(poll.getId());
         pollResponse.setTitle(poll.getTitle());
@@ -136,5 +135,24 @@ public class PollService {
         }
 
         return mapPollToPollResponse(poll, currentUser, mapPollToChoiceResponses(poll));
+    }
+
+    public ResponseEntity<?> deletePoll(Long pollId, UserDetailsImpl currentUser) {
+        Poll poll = pollRepository.findById(pollId).orElseThrow(
+                () -> new ResourceNotFoundException("Poll", "id", pollId));
+
+        if (poll.getCreatedBy() != currentUser.getId()) {
+            return new ResponseEntity(
+                    new ApiResponse(false, "Unauthorized"),
+                    HttpStatus.UNAUTHORIZED
+            );
+        }
+
+        pollRepository.delete(poll);
+
+        return new ResponseEntity(
+                new ApiResponse(true, "Successfully deleted poll " + pollId),
+                HttpStatus.OK
+        );
     }
 }
