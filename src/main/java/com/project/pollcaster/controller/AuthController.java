@@ -111,4 +111,10 @@ public class AuthController {
                 new ApiResponse(true, "User updated successfully!")
         );
     }
+
+    @GetMapping("/authenticated")
+    public ResponseEntity<?> isAuthenticated(@CurrentUser UserDetailsImpl currentUser) {
+        boolean authenticated = currentUser != null;
+        return new ResponseEntity(authenticated, HttpStatus.OK);
+    }
 }
