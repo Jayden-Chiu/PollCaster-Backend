@@ -44,17 +44,21 @@ public class AuthController {
     // authenticate user
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+        String username = loginRequest.getUsername();
+        String password = loginRequest.getPassword();
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword()
+                        username, password
                 )
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = jwtTokenProvider.generateToken(authentication);
-        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User",
+                        "username", username));
+        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, user.getId()));
     }
 
     // create user
@@ -84,7 +88,7 @@ public class AuthController {
     @PatchMapping("/update")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> updateUser(@CurrentUser UserDetailsImpl currentUser,
-                           @RequestBody @Valid SignupUpdateRequest signupUpdateRequest) {
+                                        @RequestBody @Valid SignupUpdateRequest signupUpdateRequest) {
         Long id = currentUser.getId();
         String oldUsername = currentUser.getUsername();
         String newUsername = signupUpdateRequest.getUsername();
