@@ -123,6 +123,7 @@ public class AuthController {
     }
 
     @GetMapping("/{jwtToken}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> userFromToken(@PathVariable String jwtToken) {
         boolean validToken = jwtTokenProvider.validateToken(jwtToken);
 
