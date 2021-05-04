@@ -57,7 +57,7 @@ public class AuthController {
 
         String jwt = jwtTokenProvider.generateToken(authentication);
         User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User",
-                        "username", username));
+                "username", username));
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, user.getId()));
     }
 
@@ -120,5 +120,22 @@ public class AuthController {
     public ResponseEntity<?> isAuthenticated(@CurrentUser UserDetailsImpl currentUser) {
         boolean authenticated = currentUser != null;
         return new ResponseEntity(authenticated, HttpStatus.OK);
+    }
+
+    @GetMapping("/{jwtToken}")
+    public ResponseEntity<?> userFromToken(@PathVariable String jwtToken) {
+        boolean validToken = jwtTokenProvider.validateToken(jwtToken);
+
+        if (!validToken) {
+            return new ResponseEntity(
+                    new ApiResponse(false, "Error validating JWT token"),
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        Long userId = jwtTokenProvider.getIdFromJwt(jwtToken);
+
+        return new ResponseEntity(
+                userId, HttpStatus.OK
+        );
     }
 }
