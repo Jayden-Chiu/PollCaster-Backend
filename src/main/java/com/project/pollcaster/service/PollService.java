@@ -40,13 +40,29 @@ public class PollService {
                     page.getSize(), page.getTotalElements(), page.getTotalPages());
         }
 
-        List<Long> pollIds = page.map(Poll::getId).getContent();
-
-
         // map polls to poll responses
         List<PollResponse> pollResponses = page.map(poll -> {
             return mapPollToPollResponse(poll, currentUser, mapPollToChoiceResponses(poll));
+        }).getContent();
 
+        return new PageResponse<>(pollResponses, page.getNumber(),
+                page.getSize(), page.getTotalElements(), page.getTotalPages());
+
+    }
+
+    public PageResponse<PollResponse> getAllPollsByUser(UserDetailsImpl currentUser, Long userId, Pageable pageable) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new ResourceNotFoundException("User", "id", userId));
+
+        Page<Poll> page = pollRepository.findByCreatedBy(userId, pageable);
+
+        if (page.getNumberOfElements() == 0) {
+            return new PageResponse<>(Collections.emptyList(), page.getNumber(),
+                    page.getSize(), page.getTotalElements(), page.getTotalPages());
+        }
+
+        List<PollResponse> pollResponses = page.map(poll -> {
+            return mapPollToPollResponse(poll, currentUser, mapPollToChoiceResponses(poll));
         }).getContent();
 
         return new PageResponse<>(pollResponses, page.getNumber(),

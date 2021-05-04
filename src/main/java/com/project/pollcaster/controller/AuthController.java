@@ -136,7 +136,7 @@ public class AuthController {
         Long userId = jwtTokenProvider.getIdFromJwt(jwtToken);
 
         return new ResponseEntity(
-                userId, HttpStatus.OK
+                new JwtAuthenticationResponse(jwtToken,userId), HttpStatus.OK
         );
     }
 }

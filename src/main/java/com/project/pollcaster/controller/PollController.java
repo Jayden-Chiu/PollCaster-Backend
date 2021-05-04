@@ -33,11 +33,18 @@ public class PollController {
     @Autowired
     PollService pollService;
 
-
     // get all polls
     @GetMapping
     public PageResponse<PollResponse> getAllPolls(@CurrentUser UserDetailsImpl currentUser, Pageable pageable) {
         return pollService.getAllPolls(currentUser, pageable);
+    }
+
+
+    @GetMapping("/user/{userId}")
+    public PageResponse<PollResponse> getAllPollsByUser(@CurrentUser UserDetailsImpl currentUser,
+                                                        @PathVariable Long userId,
+                                                        Pageable pageable) {
+        return pollService.getAllPollsByUser(currentUser, userId, pageable);
     }
 
     // get poll by id
