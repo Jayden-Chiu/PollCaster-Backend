@@ -97,6 +97,12 @@ public class PollService {
 
         pollResponse.setChoices(choiceResponses);
 
+        long totalVotes = 0;
+        for (int i = 0; i < choiceResponses.size(); i++) {
+            totalVotes += choiceResponses.get(i).getVoteCount();
+        }
+        pollResponse.setTotalVotes(totalVotes);
+
         Long userId = poll.getCreatedBy();
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id",
                 userId));
